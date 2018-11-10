@@ -29,8 +29,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -39,7 +37,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -101,11 +98,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         init(context);
         final Vibrator vibe = (Vibrator)getSystemService(Context.VIBRATOR_SERVICE);
 
-
-
-        //GesturePerformListener gesturePerformListener = new GesturePerformListener(gestureLibrary);
-
-        //gestureOverlayView.addOnGesturePerformedListener(gesturePerformListener);
         gestureOverlayView.addOnGesturePerformedListener(new GestureOverlayView.OnGesturePerformedListener() {
             @Override
             public void onGesturePerformed(GestureOverlayView gestureOverlayView, Gesture gesture) {
@@ -135,8 +127,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     // Display a snackbar with related messages.
                     Toast.makeText(gestureOverlayView.getContext(),messageBuffer.toString(),Toast.LENGTH_LONG).show();
                     message = messageBuffer.toString();
-                    //Snackbar snackbar = Snackbar.make(gestureOverlayView, messageBuffer.toString(), Snackbar.LENGTH_LONG);
-                    //snackbar.show();
                     myAction(message);
                 }
             }
@@ -150,22 +140,14 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         //Media Player
        try {
-            //afd = this.getResources().openRawResourceFd(songs[songIndex]);
             mp = new MediaPlayer();
-            //mp = MediaPlayer.create(this, R.raw.music);
             mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
             mp.setDataSource(getApplicationContext(),Uri.parse(song_urls[songIndex]));
-            //mp.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
-
             mp.prepare();
-            //textView.setText("Song Info: "+mp.getTrackInfo()[);
-
             totalTime = mp.getDuration();
         } catch (Exception e){
             Log.e("Music Player ", "onCreate: ",e);
         }
-
-
 
         //Position Bar
         positionBar = (SeekBar) findViewById(R.id.positionBar);
@@ -273,11 +255,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         if(mp==null){
             try {
                 mp = new MediaPlayer();
-                //mp = MediaPlayer.create(this, R.raw.music);
                 mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
                 mp.setDataSource(getApplicationContext(), Uri.parse(song_urls[songIndex]));
-                //mp.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
-
                 mp.prepare();
                 totalTime = mp.getDuration();
                 mp.start();
@@ -295,7 +274,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         else if(mp.isPlaying() && mp!=null){
             mp.pause();
             pauseCurrentPosition = mp.getCurrentPosition();
-            playBtn.setBackgroundResource(R.drawable.play);
+            playBtn.setBackgroundResource(R.drawable.play1);
         }
         else {
             mp.start();
@@ -317,7 +296,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 }
                 else {
                     myTTS.setLanguage(Locale.US);
-                    myVoice("Voice Command Activated!");
                 }
             }
         });
@@ -500,15 +478,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     protected void nextOrPreviousSong(String orientation){
         mp.stop();
         mp.reset();
-        playBtn.setBackgroundResource(R.drawable.play);
+        playBtn.setBackgroundResource(R.drawable.play1);
         if (orientation.contains("next")){
             songIndex = (songIndex+1)%song_urls.length;
             try {
                 mp = new MediaPlayer();
-                //mp = MediaPlayer.create(this, R.raw.music);
                 mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
                 mp.setDataSource(getApplicationContext(), Uri.parse(song_urls[songIndex]));
-                //mp.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
                 mp.prepare();
                 totalTime = mp.getDuration();
                 mp.start();
@@ -517,7 +493,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             catch (Exception e){
                 showToastMessage(e.getMessage());
             }
-
 
         }
         else if(orientation.contains("previous")){
@@ -546,6 +521,5 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     @Override
     protected void onPause(){
         super.onPause();
-        //myTTS.shutdown();
     }
 }
