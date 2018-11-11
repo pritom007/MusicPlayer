@@ -41,6 +41,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Random;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
     private static final int VOICE_RECOGNITION_REQUEST_CODE = 1001;
@@ -53,19 +54,23 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private GestureOverlayView gestureOverlayView = null;
     private String message;
     private GestureLibrary gestureLibrary = null;
-
+    //Text to Speech
     private TextToSpeech myTTS;
 
     Sensor sensor;
     SensorManager sensorManager;
     boolean isLight = true;
+    //Buttons
     Button playBtn,nextBtn,previousBtn;
+    //seek bars
     SeekBar positionBar, volumbar;
+    //Textviews
     TextView elapsedTimeLabel, remainingTimeLabel, textView;
+    //Music player
     MediaPlayer mp;
     int pauseCurrentPosition;
     int totalTime;
-    //
+
 
     int songIndex = 0;
     String[] song_urls = {"https://od.lk/s/NDFfOTkzMjUxOF8/Baarish.mp3",
@@ -89,7 +94,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        sensor = sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
+        sensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
         //mbtSpeak = (Button) findViewById(R.id.btSpeak);
         //checkVoiceRecognition();
 
@@ -124,7 +129,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                         messageBuffer.append("Your gesture do not match any predefined gestures.");
                     }
 
-                    // Display a snackbar with related messages.
+                    // Display gesture related messages.
                     Toast.makeText(gestureOverlayView.getContext(),messageBuffer.toString(),Toast.LENGTH_LONG).show();
                     message = messageBuffer.toString();
                     myAction(message);
@@ -210,21 +215,26 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 }
             }
         }).start();
+        //On shake shuffling will occur
         mShaker = new ShakeListener(this);
         mShaker.setOnShakeListener(new ShakeListener.OnShakeListener () {
             @SuppressLint("MissingPermission")
             public void onShake()
             {
                 vibe.vibrate(100);
-                showToastMessage("shooken "+mShaker.getShakeCount() );
-                myVoice("Don't shake me");
+                showToastMessage("phone shacked");
+                myVoice("shuffling music ");
+                shuffleArray(song_urls);
+                songIndex = new Random().nextInt(song_urls.length);
+                mp.reset();
+                playBtnClick(playBtn);
 
             }
         });
 
 
     }
-
+    //For the position bar update
     private Handler handler = new Handler(){
         @Override
         public void handleMessage(Message msg){
@@ -379,15 +389,24 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     @TargetApi(Build.VERSION_CODES.DONUT)
     @RequiresApi(api = Build.VERSION_CODES.CUPCAKE)
+    //process the voice commands
     private void processResult(String command) {
         command = command.toLowerCase();
         Toast.makeText(MainActivity.this, "In process", Toast.LENGTH_SHORT).show();
         if(command.indexOf("play") != -1){
             showToastMessage("playing");
             myVoice("playing");
-            playBtnClick(playBtn);
+            if(command.indexOf("next")!= -1){
+                nextOrPreviousSong("next");
+            }
+            else  if(command.indexOf("previous")!= -1){
+                nextOrPreviousSong("previous");
+            }
+            else {
+                playBtnClick(playBtn);
+            }
         }
-        else if (command.indexOf("stop") != -1){
+        else if (command.indexOf("stop") != -1 || command.indexOf("pause")!= -1){
             playBtnClick(playBtn);
         }
         else if (command.indexOf("what") != -1){
@@ -398,14 +417,15 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 myVoice("The time is: "+time);
             }
             else if (command.indexOf("name") != -1){
-                myVoice("my name is VMusic");
-                showToastMessage("my name is VMusic");
+                myVoice("my name is VSGMusic");
+                showToastMessage("my name is VSGMusic");
             }
         }
 
     }
 
     @RequiresApi(api = Build.VERSION_CODES.DONUT)
+    //actions for the gestures
     private void myAction(String message) {
         if(message.contains("yes")) {
             myTTS.speak("ok playing",TextToSpeech.QUEUE_FLUSH,null);
@@ -450,17 +470,16 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
-        if (sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY) == null){
-            isLight = true;
-            myVoice("Your phone doesn't have proximity");
-        }
-        else if(sensorEvent.sensor.getType() == Sensor.TYPE_PROXIMITY) {
+        if(sensorEvent.sensor.getType() == Sensor.TYPE_LIGHT) {
             if (sensorEvent.values[0] > 0) {
                 isLight= true;
+                playBtnClick(playBtn);
             }
             else {
                 isLight = false;
-                //mp.pause();
+                mp.pause();
+                pauseCurrentPosition = mp.getCurrentPosition();
+
             }
         }
     }
@@ -512,6 +531,18 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }
 
     }
+    //helping function for shuffling music
+    private static void shuffleArray(String[] array) {
+        int index;
+        String temp;
+        Random random = new Random();
+        for (int i = array.length - 1; i > 0; i--){
+            index = random.nextInt(i + 1);
+            temp = array[index];
+            array[index] = array[i];
+            array[i] = temp;
+        }
+    }
     /**
      * Helper method to show the toast message
      **/
@@ -519,7 +550,14 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
     @Override
+    protected void onResume(){
+        super.onResume();
+        sensorManager.registerListener(this,sensor,SensorManager.SENSOR_DELAY_NORMAL);
+    }
+
+    @Override
     protected void onPause(){
         super.onPause();
+        sensorManager.unregisterListener(this);
     }
 }

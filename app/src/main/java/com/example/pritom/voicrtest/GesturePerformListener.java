@@ -61,12 +61,11 @@ public class GesturePerformListener implements GestureOverlayView.OnGesturePerfo
                 messageBuffer.append("Your gesture do not match any predefined gestures.");
             }
 
-            // Display a snackbar with related messages.
+            // Display related messages.
             Toast.makeText(gestureOverlayView.getContext(),messageBuffer.toString(),Toast.LENGTH_LONG).show();
             Intent i = new Intent();
             i.putExtra("message",messageBuffer.toString());
-            //Snackbar snackbar = Snackbar.make(gestureOverlayView, messageBuffer.toString(), Snackbar.LENGTH_LONG);
-            //snackbar.show();
+
         }
     }
 
