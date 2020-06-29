@@ -4,13 +4,14 @@
 
 # Main Features
 
-  <b>- Voice Assistance:</b> Generally in a music player users don’t get the voice assistance app. There are some apps that provides song recognition feature but very few of them has voice assistance in them. So in our app we integrated voice assistance feature.            This assistance is not artificially intelligent but it can perform some simple tasks. For example: user can ask it to play current song, play next song, play previous song, stop/pause the current song, also can tell user the current time.
+  <b>- Voice Assistance:</b> Generally in a music player users don’t get the voice assistance app. There are some apps that provides song recognition feature but very few of them has voice assistance in them. So in our app we integrated voice assistance feature. This assistance is not artificially intelligent but it can perform some simple tasks. For example: user can ask it to play current song, play next song, play previous song, stop/pause the current song, also can tell user the current time.
 Text-to-Speech: In accordance with the voice assistance we have integrated text-to-speech function. When user gives any voice command via the voice assistance, the text-to-speech feature will speak accordingly. This feature is not so user friendly for a music player but still can be polished so that users get better experience.
 
- <b>- Gesture:</b> In this app we have used custom made gesture features. Generally android library provides “tapping”, “double tapping”, “fling” etc. as gesture. But if user wants to do other gestures then it’s not possible to do perform with the traditional gesture library. In this project we backtracked a third party app named “gesture builder” [2]. With the help of this app we custom made three gestures: 
-    1) Tick (✓): plays or pauses the current song.
-    2) Left to Right (->): plays previous song.
-    3) Right to Left (<-): plays next song.
+ <b>- Gesture:</b> In this app we have used custom made gesture features. Generally android library provides “tapping”, “double tapping”, “fling” etc. as gesture. But if user wants to do other gestures then it’s not possible to do perform with the traditional gesture library. In this project we backtracked a third party app named “gesture builder”. With the help of this app we custom made three gestures: 
+      
+   1) Tick (✓): plays or pauses the current song.
+   2) Left to Right (->): plays previous song.
+   3) Right to Left (<-): plays next song.
   
    Actually we can create any gestures and assign that to a task. So after creating the gesture from the described 3rd party app we  extracted the raw file from the app by debugging the app. And after that we integrated the gesture in our music player. The gesture extracting process will be described briefly in the upcoming part.
 Accelerometer Sensor: We included shaking feature in our app. If the user shake or vibrates the app then it playlist shuffles. We used accelerometer sensor to detect the vibration. The relevant code can be found in “shakeListener.java” file. Inside the “onSensorChanged” method we sensor values of accelerometer sensor.    
